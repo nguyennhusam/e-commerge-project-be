@@ -49,8 +49,8 @@ exports.updateQuantityProductItemInCart = async (req, res, next) => {
         const quantity = req.body.quantity;
 
         const saveCart = await Cart.findOneAndUpdate(
-            { _id: cartID, productItem: { $elemMatch: { id: productID } } },
-            { $set: { "productItem.$.quantity": quantity } },
+            { _id: cartID, "productItem.id": productID }, 
+            { $inc: { "productItem.$.quantity": quantity } }, 
             { new: true }
         );
 
