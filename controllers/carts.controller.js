@@ -15,21 +15,29 @@ exports.addProductItemInCart = async (req,res,next)=>{
         const productExist = await Cart.findOne(
             {
                 _id: cartExist._id,
-                productItem: { $elemMatch: { id: productID } }
+                productItem: { $elemMatch: { id: req.params.productId } }
             }
         );
+
+        const productToAdd = {
+            id: productID,
+            name: req.body.name,
+            quantity: req.body.quantity,
+            images: req.body.images,
+            price: req.body.price
+        };
         // ADD ITEM
         let addItem = null;
         if (productExist) {
             addItem = await Cart.findOneAndUpdate(
                 { _id: cartExist._id, productItem: { $elemMatch: { id: productID } } },
-                { $set: { "productItem.$": req.body } },
+                { $set: { "productItem.$": productToAdd } },
                 { new: true }
             );
         } else {
             addItem = await Cart.findByIdAndUpdate(
                 cartExist._id,
-                { $push: { productItem: req.body } },
+                { $push: { productItem: productToAdd } },
                 { new: true }
             );
         }

@@ -8,31 +8,35 @@ const Product = require("../models/products.model");
 exports.createOrder = async (req,res,next)=>{
     try {
         const userID = req.user._id;
-        const totalPrice = req.body.total;
         const listProductCheckout = req.body.listProduct;
         const listIDProduct = listProductCheckout.map((product) => product.id);
+        console.log("ListProduct " + listIDProduct);
         const shipAddress = req.body.shipAddress;
 
         const listProduct = await Promise.all(listProductCheckout.map((product) => Product.findById(product.id)));
         for (let i = 0; i < listProduct.length; i++) {
+            console.log("ListProduct " , listProductCheckout);
             if (listProduct[i].countInStock < listProductCheckout[i].quantity) {
                 return res.status(422).send({
                     success: false,
                     message: "Số lượng sản phẩm trong kho không đủ để đáp ứng nhu cầu của bạn!"
                 })
             }
-        }
-        await Promise.all(listProductCheckout.map((product) =>
-            Product.findByIdAndUpdate(
-                product._id,
+            await Product.findByIdAndUpdate(
+                listProduct[i]._id,
                 {
                     $inc: {
-                        countInStock: - product.countInStock
+                        countInStock: -listProductCheckout[i].quantity
                     }
                 },
                 { new: true }
-            )
-        ));
+            );
+
+        }
+        const totalPrice = listProductCheckout.reduce((acc, product, index) => {
+            return acc + product.quantity * listProduct[index].price;
+        }, 0);
+        
 
         // CART INFO OF USER
         const cartByUser = await Cart.findOne({
