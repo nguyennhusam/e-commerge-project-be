@@ -36,7 +36,7 @@ exports.addProductItemInCart = async (req,res,next)=>{
 
         if (!addItem) return next(createError(404, "Thêm sản phẩm vào Giỏ hàng thất bại!"));
 
-        res.status(200).send("Thêm sản phẩm vào Giỏ hàng thành công!");
+        return res.status(200).send("Thêm sản phẩm vào Giỏ hàng thành công!");
     } catch (err) {
         next(err);
     } 
@@ -54,7 +54,7 @@ exports.updateQuantityProductItemInCart = async (req, res, next) => {
             { new: true }
         );
 
-        res.status(200).send({
+        return res.status(200).send({
             success: true,
             data: saveCart
         })
@@ -79,16 +79,11 @@ exports.deleteProductItemInCart = async (req, res, next) => {
 
         if (!deleteItem) return next(createError(404, "Sản phẩm muốn xóa, không tồn tại trong Giỏ hàng!"));
 
-        res.status(200).send("Xóa sản phẩm ra khỏi Giỏ hàng thành công!");
+        return res.status(200).send("Xóa sản phẩm ra khỏi Giỏ hàng thành công!");
     } catch (err) {
         next(err);
     }
 }
-
-
-
-
-
 
 exports.createCart = async (req,res, next) =>{
     try{
@@ -121,22 +116,19 @@ exports.updateCart = async (req, res, next) => {
             { new: true }
         );
 
-        res.status(200).send(saveCart);
+        return res.status(200).send(saveCart);
     } catch (err) {
         next(err);
     }
 }
 
-
-
 exports.getCartByID = async (req, res, next) => {
     try {
-        const cartID = req.params.id;
-        const cartExist = await Cart.findById(cartID);
+        const userId = req.user._id;
+        const findUser = await Cart.findOne({user: userId});
+        if (!findUser) return next(createError(404, "Giỏ hàng không tồn tại!"));
 
-        if (!cartExist) return next(createError(404, "Giỏ hàng không tồn tại!"));
-
-        res.status(200).send(cartExist);
+        return res.status(200).send(findUser);
     } catch (err) {
         next(err);
     }

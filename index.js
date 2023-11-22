@@ -64,9 +64,9 @@ app.use(
                 {url: "/products/getallproduct", methods:["GET"]},
                 {url: "/products/getproductbyid/:id", methods:["GET"]},
                 
-                {url: "/carts/getAll/:id", methods:["GET"]},
+
                 {url: "carts/updproductInCart/:cartID", methods:["POST"]},
-                {url: "/carts/delproductInCart/:id/:productId", methods:["POST"]},
+                {url: "/carts/delproductInCart/:id/:productId", methods:["DELETE"]},
                 
             ],
         })(req, res, next);

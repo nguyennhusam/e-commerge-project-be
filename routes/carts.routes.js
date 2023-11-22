@@ -5,9 +5,9 @@ const router = express.Router();
 
 // CREATE
 router.post("/addproductInCart/:productId",auth.authenticateToken,cartController.createCart, cartController.addProductItemInCart);
-router.post("/delproductInCart/:id/:productId", cartController.deleteProductItemInCart);
+router.delete("/delproductInCart/:id/:productId", cartController.deleteProductItemInCart);
 router.post("/updproductInCart/:cartID", cartController.updateQuantityProductItemInCart);
-router.get("/getAll/:id", cartController.getCartByID);
+router.get("/getAll",auth.authenticateToken,  cartController.getCartByID);
 
 
 

@@ -16,7 +16,7 @@ const orderSchema = new Schema(
                 },
                 name: { type: String, require: true },
                 quantity: { type: Number, require: true },
-                images: { type: [String], require: false },
+                images: { type: String, require: false },
                 price: { type: Number, require: true }
             },
         ],

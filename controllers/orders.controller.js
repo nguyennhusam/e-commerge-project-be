@@ -15,7 +15,7 @@ exports.createOrder = async (req,res,next)=>{
 
         const listProduct = await Promise.all(listProductCheckout.map((product) => Product.findById(product.id)));
         for (let i = 0; i < listProduct.length; i++) {
-            if (listProduct[i].countInStock < listProductCheckout[i].countInStock) {
+            if (listProduct[i].countInStock < listProductCheckout[i].quantity) {
                 return res.status(422).send({
                     success: false,
                     message: "Số lượng sản phẩm trong kho không đủ để đáp ứng nhu cầu của bạn!"
@@ -24,7 +24,7 @@ exports.createOrder = async (req,res,next)=>{
         }
         await Promise.all(listProductCheckout.map((product) =>
             Product.findByIdAndUpdate(
-                product.id,
+                product._id,
                 {
                     $inc: {
                         countInStock: - product.countInStock
@@ -52,7 +52,7 @@ exports.createOrder = async (req,res,next)=>{
             { $pull: { productItem: { id: { $in: listIDProduct } } } },
             { new: true }
         )
-        newCart.total = newCart.shoeItem.reduce((acc, cur) => cur.quantity * cur.price, 0);
+        newCart.total = newCart.productItem.reduce((acc, cur) => cur.quantity * cur.price, 0);
         await newCart.save();
 
         res.status(200).send({
