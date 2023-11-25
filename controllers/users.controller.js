@@ -12,7 +12,7 @@ exports.register = async (req, res, next) => {
 
         req.body.password = bcryptjs.hashSync(password, salt);
 
-        if(username ===  undefined || username === ""){
+        if(username ===  undefined || username === "" || email ===  undefined || email === "" ){
             return res.status(404).send({
                 success: false,
                 message:"Vui lòng nhập username để đăng kí"
@@ -25,6 +25,15 @@ exports.register = async (req, res, next) => {
             return res.status(201).send({
                 success: false,
                 message: "Username đã tồn tại vui lòng đăng kí mới"
+            })
+        };
+
+        const emails = await User.findOne({ email });
+
+        if (emails) {
+            return res.status(201).send({
+                success: false,
+                message: "Email đã tồn tại vui lòng đăng kí mới"
             })
         };
 
@@ -53,15 +62,15 @@ exports.register = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
     try {
-        const {username, password} = req.body;
-        if (username === "" || password === ""){
+        const {email, password} = req.body;
+        if (email === "" || password === ""){
             return res.status(201).send({
                 success: false,
                 message:" Vui lòng nhập đầy đủ các trường!"
             });
         }
         
-        const resultUser = await User.findOne({username});
+        const resultUser = await User.findOne({email});
         console.log(resultUser.role);
         if (!resultUser) {
             return res.status(201).send({
