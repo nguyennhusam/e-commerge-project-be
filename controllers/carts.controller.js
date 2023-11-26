@@ -134,7 +134,8 @@ exports.getCartByID = async (req, res, next) => {
     try {
         const userId = req.user._id;
         const findUser = await Cart.findOne({user: userId});
-        if (!findUser) return next(createError(404, "Giỏ hàng không tồn tại!"));
+        if (!findUser) 
+        return res.status(404).json({error: 'Not found user'});
 
         return res.status(200).send(findUser);
     } catch (err) {

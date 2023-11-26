@@ -10,7 +10,6 @@ async function authenticateToken(req, res, next) {
     try {
       const user = await jwt.verify(accessToken, process.env.JWT);
       const resultUser = await User.findOne({ _id: user?.data });
-      console.log(resultUser.role);
       req.user = resultUser;
       next();
     } catch (err) {

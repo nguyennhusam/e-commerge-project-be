@@ -15,7 +15,7 @@ exports.register = async (req, res, next) => {
         if(username ===  undefined || username === "" || email ===  undefined || email === "" ){
             return res.status(404).send({
                 success: false,
-                message:"Vui lòng nhập username để đăng kí"
+                message:"Vui lòng nhập đầy đủ các thông tin"
             })
         };
 
@@ -49,11 +49,12 @@ exports.register = async (req, res, next) => {
                 message: "Đăng Ký User Mới Không Thành Công!"
             });
         }
-        res.status(200).send({
-            success: true,
-            message: "Đăng Ký User Mới Thành Công!",
-            data: newUser
-        });
+        // res.status(200).send({
+        //     success: true,
+        //     message: "Đăng Ký User Mới Thành Công!",
+        //     data: newUser
+        // });
+        res.status(200).send({success: true, ...newUser.toJSON()});
     } catch (err) {
         next(err);
     }
@@ -71,7 +72,6 @@ exports.login = async (req, res, next) => {
         }
         
         const resultUser = await User.findOne({email});
-        console.log(resultUser.role);
         if (!resultUser) {
             return res.status(201).send({
                 success: false,
@@ -89,7 +89,7 @@ exports.login = async (req, res, next) => {
         if (isCorrectPassword && resultUser){
             const access_token = auth.generateAccessToken(resultUser._id); 
             // const { password, createdAt, updatedAt, _v , role , ...others} = resultUser._doc;
-            return res.status(200).json({ ...resultUser.toJSON(), access_token });
+            return res.status(200).json({ success: true, ...resultUser.toJSON(), access_token });
             
         }
 
