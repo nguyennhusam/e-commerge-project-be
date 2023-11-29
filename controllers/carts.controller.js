@@ -50,11 +50,11 @@ exports.addProductItemInCart = async (req,res,next)=>{
     } 
 };
 
-exports.updateQuantityProductItemInCart = async (req, res, next) => {
+exports.increaseQuantityProductItemInCart = async (req, res, next) => {
     try {
         const cartID = req.params.cartID;
         const productID = req.body.productId;
-        const quantity = req.body.quantity;
+        const quantity = 1;
 
         const saveCart = await Cart.findOneAndUpdate(
             { _id: cartID, "productItem.id": productID }, 
@@ -70,6 +70,52 @@ exports.updateQuantityProductItemInCart = async (req, res, next) => {
         next(err);
     }
 }
+
+exports.decreaseQuantityProductItemInCart = async (req, res, next) => {
+    try {
+        const cartID = req.params.cartID;
+        const productID = req.body.productId;
+        const quantity = 1;
+
+        //kiem tra so luong trong gio hang
+        const findProInCart = await Cart.findOne({_id: cartID, "productItem.id": productID});
+        if( findProInCart.productItem[0].quantity - quantity < 0 ){
+            return res.status(400).send({
+                success: false,
+                message: "Không thể giảm số lượng được nữa"
+            });
+        }
+        ;
+
+        if (quantity <= 0) {
+            return res.status(400).send({
+                success: false,
+                message: "Số lượng phải là dương"
+            });
+        }
+
+        const saveCart = await Cart.findOneAndUpdate(
+            { _id: cartID, "productItem.id": productID },
+            { $inc: { "productItem.$.quantity": -quantity } }, 
+            { new: true }
+        );
+
+        if (!saveCart) {
+            return res.status(404).send({
+                success: false,
+                message: "Không tìm thấy giỏ hàng"
+            });
+        }
+
+        return res.status(200).send({
+            success: true,
+            data: saveCart
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
 
 
 exports.deleteProductItemInCart = async (req, res, next) => {
