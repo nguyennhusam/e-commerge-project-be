@@ -5,6 +5,7 @@ const router = express.Router();
 
 // CREATE
 router.post("/new/:productId",auth.authenticateToken, reviewController.createReview);
+router.get("/:productId",auth.authenticateToken, reviewController.getReview);
 
 // // GET ALL REVIEW BY SHOE ID
 // router.get("/getAll/:reviewID", reviewController.getAllReviewByShoeID);

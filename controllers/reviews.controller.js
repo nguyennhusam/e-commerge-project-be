@@ -4,7 +4,23 @@ const Review = require("../models/reviews.model");
 const { createError } = require("../middlewares/error");
 
 
-
+exports.getReview = async (req, res) =>{
+  try {
+    const productId = req.params.productId;
+    const product = await Product.findOne({ _id: productId}).populate({
+      path: 'reviews',
+      populate: {
+        path: 'owner',
+        select: 'username'
+      }
+    })
+    if (!product) return createError(404, "Không tìm thấy sản phẩm");
+    
+    return res.json(product);
+  } catch (error) {
+    return res.json(error.message);
+  }
+}
 exports.createReview = async (req, res) => {
   const ProductId = req.params.productId;
   const { content, rating } = req.body;
