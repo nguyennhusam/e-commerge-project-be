@@ -32,7 +32,9 @@ exports.addProductItemInCart = async (req,res,next)=>{
         if (productExist) {
             //kiem tra so luong trong gio hang
             const findProInCart = await Cart.findOne({_id: cartExist._id, "productItem.id": productID});
+            console.log("Cart find", findProInCart);
             const quantity1 = req.body.quantity + findProInCart.productItem[0].quantity;
+            
             const productToAdd1 = {
                 id: productID,
                 name: req.body.name,
