@@ -15,5 +15,4 @@ router.post("/decreproductInCart/:cartID", cartController.decreaseQuantityProduc
 router.get("/getAll",auth.authenticateToken,  cartController.getCartByID);
 
 
-////////
 module.exports = router;

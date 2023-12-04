@@ -78,6 +78,73 @@ exports.increaseQuantityProductItemInCart = async (req, res, next) => {
     }
 }
 
+//them 1 sp ngoai trang chu 
+exports.increaseQuantityProductInCart = async (req, res, next) => {
+    try {
+        const userID = req.user._id;
+        const productID = req.params.productId;
+        const quantity = 1 ;
+
+        const cartExist = await Cart.findOne({user: userID});
+        
+
+        const productExist = await Cart.findOne(
+            { _id: cartExist._id, "productItem.id": req.params.productId },
+            { "productItem.$": 1 }
+        );
+        const productToAdd = {
+            id: productID,
+            name: req.body.name,
+            quantity: quantity,
+            images: req.body.images,
+            price: req.body.price
+        };
+        // ADD ITEM
+        let addItem = null;
+        if (productExist) {
+            addItem  = await Cart.findOneAndUpdate(
+                { _id: cartExist._id, "productItem.id": productID }, 
+                { $inc: { "productItem.$.quantity": quantity } }, 
+                { new: true }
+            );
+        } else {
+            addItem = await Cart.findByIdAndUpdate(
+                cartExist._id,
+                { $push: { productItem: productToAdd } },
+                { new: true }
+            );
+        }
+
+        if (!addItem) return next(createError(404, "Thêm sản phẩm vào Giỏ hàng thất bại!"));
+
+        return res.status(200).send("Thêm sản phẩm vào Giỏ hàng thành công!");
+    } catch (err) {
+        next(err);
+    }
+    
+    
+    
+    try {
+
+        const cartID = req.params.cartID;
+        const productID = req.body.productId;
+        const quantity = 1;
+
+        const saveCart = await Cart.findOneAndUpdate(
+            { _id: cartID, "productItem.id": productID }, 
+            { $inc: { "productItem.$.quantity": quantity } }, 
+            { new: true }
+        );
+
+        return res.status(200).send({
+            success: true,
+            data: saveCart
+        })
+    } catch (err) {
+        next(err);
+    }
+}
+
 exports.decreaseQuantityProductItemInCart = async (req, res, next) => {
     try {
         const cartID = req.params.cartID;
@@ -188,7 +255,7 @@ exports.getCartByID = async (req, res, next) => {
         const userId = req.user._id;
         const findUser = await Cart.findOne({user: userId});
         if (!findUser) 
-        return res.status(404).json({error: 'Not found user'});
+        return res.status(404).json({error: 'Not found user'}); 
 
         return res.status(200).send(findUser);
     } catch (err) {
